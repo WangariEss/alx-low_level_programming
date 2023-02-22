@@ -1,5 +1,4 @@
 #include <stdio.h>
-
 /**
  * main - printing the first 98 fibonacci numbers
  *
