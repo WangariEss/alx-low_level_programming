@@ -1,65 +1,50 @@
 #include "lists.h"
-#include <stdlib.h>
 
 /**
- * delete_dnodeint_at_index - delete node at give index
- * @head:list
- * @index:given index
- * Return: -1 or 0
+ * delete_dnodeint_at_index - Deletes the node at idx of a double linked list
+ * @head: header of double linked list
+ * @index: index of the node, starting from 0
+ * Return: 1 if it succeeded, -1 if it failed
  */
 int delete_dnodeint_at_index(dlistint_t **head, unsigned int index)
 {
-	dlistint_t *start;
+	dlistint_t *pre, *headcopy = *head;
 	unsigned int i;
-	unsigned int len;
-	len = len_node(&head);
 
-	start = *head;
-	if (*head == NULL)
+	while (headcopy != NULL && headcopy->prev != NULL)
+	{
+		headcopy = headcopy->prev;
+		*head = (*head)->prev;
+	}
+	if (headcopy != NULL && index != 0)
+	{
+		for (i = 0; i < index && headcopy != NULL; i++)
+		{
+			pre = headcopy;
+			headcopy = headcopy->next;
+		}
+		if (headcopy != NULL)
+		{
+			pre->next = headcopy->next;
+			if (pre->next != NULL)
+				headcopy->next->prev = pre;
+			free(headcopy);
+			return (1);
+		}
 		return (-1);
-	if (index == 0)
+	}
+	if (headcopy != NULL && index == 0)
 	{
-		start = start->next;
-		free(*head);
-		*head = start;
-		if (start != NULL)
-			start->prev = NULL;
+		pre = headcopy->next;
+		if (pre == NULL)
+			*head = NULL;
+		else
+		{
+			pre->prev = NULL;
+			free(headcopy);
+			*head = pre;
+		}
 		return (1);
 	}
-	for (i = 0; i <= index - 1; i++)
-	{
-		start = start->next;
-		if (!start)
-			return (-1);
-	}
-	if (len - 1 == index)
-	{
-		start->prev->next = NULL;
-		free(start);
-		return (1);
-	}
-	start->prev->next = start->next;
-	start->next->prev = start->prev;
-	free(start);
-	return (1);
-}
-
-/**
- * len_node - list len
- *
- * @node:list
- * Return:unsigned int
- */
-unsigned int len_node(dlistint_t **node)
-{
-	unsigned int len = 0;
-	dlistint_t *start;
-
-	start = *node;
-	while (start != NULL)
-	{
-		len += 1;
-		start = start->next;
-	}
-	return (len);
+	return (-1);
 }
